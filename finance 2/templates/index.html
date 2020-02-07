@@ -1,0 +1,91 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block main %}
+
+<h1>Portfolio Overview</h1>
+
+ <table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">Symbol</th>
+      <th scope="col">Name</th>
+      <th scope="col"># of Shares</th>
+      <th scope="col">Ave Purchase Price</th>
+      <th scope="col">Total Invested</th>
+      <th scope="col">Current Price</th>
+      <th scope="col">Current total</th>
+      <th scope="col">Return</th>
+      <th scope="col">% return</th>
+    </tr>
+  </thead>
+  <tbody>
+        {% for symbol in result %}
+        {% if symbol.f_returns is lt 0 %}
+            <tr class="table-danger">
+        {% elif symbol.f_returns is gt 0 %}
+            <tr class="table-success">
+        {% else %}
+            <tr class="table-active">
+        {% endif %}
+          <td>{{ symbol.symbol }}<br></td>
+          <td>{{ symbol.name }}<br></td>
+          <td>{{ symbol.q }}<br></td>
+          <td>{{ symbol.p_ave }}<br></td>
+          <td>{{ symbol.p_total }}<br></td>
+          <td>{{ symbol.price }}<br></td>
+          <td>{{ symbol.total }}<br></td>
+          <td>{{ symbol.returns }}<br></td>
+          <td>{{ symbol.roi }}<br></td>
+        {% endfor %}
+        </tr>
+        {% if total_roi is lt 0 %}
+            <tr class="table-danger">
+        {% elif total_roi is gt 0 %}
+            <tr class="table-success">
+        {% else %}
+            <tr class="table-light">
+        {% endif %}
+          <td> All Stocks  </td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>{{ ap_total }}</td>
+          <td></td>
+          <td> {{ c_total }}</td>
+          <td> {{ total_r }} </td>
+          <td> {{ total_roi }} </td>
+        </tr>
+
+
+        <tr>
+          <td>Cash</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td> </td>
+          <td></td>
+          <td>{{py_cash}}</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td> Cash + Stocks   </td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td> </td>
+          <td></td>
+          <td> {{ acct_total }} </td>
+          <td></td>
+          <td></td>
+        </tr>
+  </tbody>
+</table>
+
+
+
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    SELL Form
+{% endblock %}
+
+{% block main %}
+
+    <h1>Sell Form</h1>
+
+    <form action="/sell" method="post">
+      <div class="form-group">
+        <!--source: https://stackoverflow.com/questions/45877080/how-to-create-dropdown-menu-from-python-list-using-flask-and-html -->
+        <select class="form-control" name="symbol">
+            {% for symbol in result %}
+                <option value="{{ symbol.symbol }}" >{{ symbol.symbol }}</option>
+            {% endfor %}
+        </select>
+      </div>
+
+        <div class="form-group">
+             <input autocomplete="off" autofocus class="form-control" name="shares" placeholder="number of shares" type="text">
+        </div>
+
+        <button class="btn btn-primary" type="submit">SELL</button>
+    </form>
+
+{% endblock %}

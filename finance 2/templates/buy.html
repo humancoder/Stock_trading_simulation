@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Purchased
+{% endblock %}
+
+{% block main %}
+
+<h1>Purchase complete</h1>
+
+    <p>
+        You bought {{shares}} {{symbol.name}} for {{symbol.price}}
+        to total: {{cost}}.<br>
+        You now have {{py_cash}} left.
+    </p>
+
+{% endblock %}

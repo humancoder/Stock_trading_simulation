@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    History
+{% endblock %}
+
+{% block main %}
+
+<h1>Transaction History</h1>
+
+ <table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">Action</th>
+      <th scope="col">Symbol</th>
+      <th scope="col"> # of Shares</th>
+      <th scope="col">Price</th>
+      <th scope="col">Total</th>
+      <th scope="col">Time</th>
+    </tr>
+  </thead>
+  <tbody>
+        {% for symbol in result %}
+        {% if symbol.action is eq "buy" %}
+            <tr class="table-info">
+        {% else %}
+            <tr class="table-warning">
+        {% endif %}
+          <td>{{ symbol.action }}<br></td>
+          <td>{{ symbol.symbol }}<br></td>
+          <td>{{ symbol.quantity }}<br></td>
+          <td>{{ symbol.price }}<br></td>
+          <td>{{ symbol.total }}<br></td>
+          <td>{{ symbol.time }}<br></td>
+        {% endfor %}
+        </tr>
+  </tbody>
+</table>
+{% endblock %}
