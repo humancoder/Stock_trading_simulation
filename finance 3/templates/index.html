@@ -29,7 +29,7 @@
         {% elif symbol.f_returns is gt 0 %}
             <tr class="table-success">
         {% else %}
-            <tr class="table-active">
+            <tr class="table-secondary">
         {% endif %}
           <td>{{ symbol.symbol }}<br></td>
           <td>{{ symbol.name }}<br></td>
@@ -59,8 +59,6 @@
           <td> {{ total_r }} </td>
           <td> {{ total_roi }} </td>
         </tr>
-
-
         <tr>
           <td>Cash</td>
           <td></td>

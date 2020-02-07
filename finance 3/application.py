@@ -53,7 +53,7 @@ def index():
     """Show portfolio of stocks"""
 
     # Gets the stocks that have positive quantity.
-    result = db.execute("SELECT SUM(total), symbol, SUM(quantity) FROM hist WHERE quantity > 0 AND user_id =:user_id GROUP BY symbol", user_id=session["user_id"])
+    result = db.execute("SELECT SUM(total), symbol, SUM(quantity) FROM hist WHERE user_id =:user_id GROUP BY symbol HAVING SUM(quantity) > 0", user_id=session["user_id"])
 
     print(result)
 
@@ -64,6 +64,7 @@ def index():
 
     # p_total is used to hold the total purchased value of ALL of the stocks
     ap_total = 0
+    getcontext().prec = 3
 
     list_results = []
     for symbol in result:
@@ -73,7 +74,7 @@ def index():
         print(f"q: {q}")
         ticker = (symbol["symbol"])
         print("new res above")
-        p_total = float(symbol["SUM(total)"])
+        p_total = Decimal(symbol["SUM(total)"])
         p_ave = p_total/q
         print(p_total)
 
@@ -83,12 +84,16 @@ def index():
         print("res above")
         price = res['price']
         total = price * q
+        total = Decimal('total')
         print(f"total: {total}")
 
+
+
         # returns = current price - purchase_p
-        returns = total + p_total
+        returns = Decimal(total + p_total)
         print(f"returns: {returns}")
-        roi = Decimal((returns/total)*100).quantize(Decimal('.01'))
+        roi = (returns/total)*100
+        roi = Decimal('roi')
         print(f"roi: {roi}")
 
         print(price)
@@ -96,8 +101,8 @@ def index():
 
         print(type(c_total))
         print(type(total))
-        c_total = float(c_total) + total
-        ap_total = float(ap_total) + p_total
+        c_total = c_total + total
+        ap_total = ap_total + p_total
 
 
         # Appends the lookup call results to new_results dictionary
@@ -131,11 +136,12 @@ def index():
     py_cash = 0
     for rrow in currentCash:
         print(rrow["cash"])
-        py_cash = rrow["cash"]
+        py_cash = Decimal(rrow["cash"])
+
 
     acct_total = py_cash + c_total
     total_r = c_total + ap_total
-    total_roi = Decimal((total_r/(-ap_total))*100).quantize(Decimal('.01'))
+    total_roi = Decimal((total_r/(-ap_total))*100)
 
     py_cash = usd(py_cash)
     c_total = usd(c_total)
@@ -197,8 +203,8 @@ def buy():
 
         db.execute("UPDATE users SET cash=:cash WHERE id=:id", cash=remaining, id=session["user_id"])
 
-        flash('Purchased!')
-        return redirect("/")
+        flash('You')
+        return render_template("buy.html", symbol=symbol, shares=shares, py_cash=py_cash, cost=cost)
 
     else:
         return render_template("buyform.html")
@@ -282,9 +288,7 @@ def quote():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Register user"""
-
-    # should reactivate once get program running
-    # session.clear()
+    session.clear()
 
     if request.method == "POST":
 
@@ -356,19 +360,31 @@ def sell():
         total = symbol["price"] * shares
 
         db.execute("INSERT INTO hist (user_id, action, symbol, price, quantity, total) VALUES(:user_id, :action, :symbol, :price, :quantity, :total)", user_id=session["user_id"], action="sell", symbol=symbol["symbol"], price=symbol["price"], quantity = -(shares), total=total)
+
+        # Updating User cash amount
+        old_cash = db.execute("SELECT cash FROM users WHERE id=:id", id=session["user_id"])
+
+        for cash in old_cash:
+            print (cash["cash"])
+            py_cash = cash["cash"]
+
+        print(f"py_cash: {py_cash}")
+
+        new_cash = total + py_cash
+
+        db.execute("UPDATE users SET cash=:cash WHERE id=:id", cash=new_cash, id=session["user_id"])
+
         flash("Sold!")
         return redirect("/")
 
     else:
-        result = db.execute("SELECT symbol, SUM(quantity) FROM hist WHERE quantity > 0 AND user_id =:user_id GROUP BY symbol", user_id=session["user_id"])
+        result = db.execute("SELECT symbol, SUM(quantity) FROM hist WHERE user_id =:user_id GROUP BY symbol HAVING SUM(quantity) > 0", user_id=session["user_id"])
 
         for symbol in result:
             print(symbol["symbol"])
             print(symbol["SUM(quantity)"])
 
         return render_template("sellform.html", result=result)
-
-
 
 def errorhandler(e):
     """Handle error"""
