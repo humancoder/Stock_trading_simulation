@@ -1,4 +1,4 @@
-# This is a similated stock trading web app
+# A simulated stock trading web app.
 
 import os
 
@@ -57,6 +57,9 @@ def index():
 
     print(result)
 
+    # Sets Decimal 2 Decimal places
+    getcontext().prec = 3
+
     # this goes through all of the returned stocks and gets their quantities
 
     # c_total is used to hold the total present value of ALL of the stocks
@@ -64,7 +67,7 @@ def index():
 
     # p_total is used to hold the total purchased value of ALL of the stocks
     ap_total = 0
-    getcontext().prec = 3
+
 
     list_results = []
     for symbol in result:
@@ -74,35 +77,40 @@ def index():
         print(f"q: {q}")
         ticker = (symbol["symbol"])
         print("new res above")
-        p_total = Decimal(symbol["SUM(total)"])
+        p_total = (symbol["SUM(total)"])
+        print(f"p_total: {p_total}")
+
+        # p_ave aka purchase ave isn't great metric atm
         p_ave = p_total/q
-        print(p_total)
+        print(f"p_ave: {p_ave}")
 
         # Get current price and full name of stock
         res = lookup(ticker)
         print(res)
-        print("res above")
-        price = res['price']
+        price = (res['price'])
+        print(f"Decimal price: {price}")
         total = price * q
-        total = Decimal('total')
         print(f"total: {total}")
 
 
 
         # returns = current price - purchase_p
-        returns = Decimal(total + p_total)
+        returns = Decimal(total) + Decimal(p_total)
         print(f"returns: {returns}")
-        roi = (returns/total)*100
-        roi = Decimal('roi')
+        roi = (Decimal(returns) / Decimal(total)) * 100
         print(f"roi: {roi}")
+        roi = Decimal(roi)
+        print(f"after Decimal roi: {roi}")
 
         print(price)
         new_results = {}
 
-        print(type(c_total))
-        print(type(total))
+        print(f"current total: {c_total} {type(c_total)}")
+        print(f"total: {total} {type(total)}")
+
         c_total = c_total + total
         ap_total = ap_total + p_total
+        print(f"ap_total before Decimal: {ap_total} {type(ap_total)}")
 
 
         # Appends the lookup call results to new_results dictionary
@@ -136,12 +144,12 @@ def index():
     py_cash = 0
     for rrow in currentCash:
         print(rrow["cash"])
-        py_cash = Decimal(rrow["cash"])
+        py_cash = rrow["cash"]
 
 
     acct_total = py_cash + c_total
     total_r = c_total + ap_total
-    total_roi = Decimal((total_r/(-ap_total))*100)
+    total_roi = (Decimal(total_r)) / (Decimal(-ap_total)) * 100
 
     py_cash = usd(py_cash)
     c_total = usd(c_total)
@@ -168,13 +176,10 @@ def buy():
         elif not request.form.get("shares"):
             return apology("please input a whole number from 1 on up", 403)
 
-        shares = float(request.form.get("shares"))
+        elif not (request.form.get("shares")).isdigit() == True:
+            return apology("must be a positive integer")
 
-        print(shares)
-
-        if (shares).is_integer() != True:
-            return apology("please input a whole number from 1 on up", 403)
-
+        shares = int(request.form.get("shares"))
         symbol = lookup(request.form.get("symbol"))
         print(symbol["price"])
         print(session["user_id"])
@@ -203,8 +208,8 @@ def buy():
 
         db.execute("UPDATE users SET cash=:cash WHERE id=:id", cash=remaining, id=session["user_id"])
 
-        flash('You')
-        return render_template("buy.html", symbol=symbol, shares=shares, py_cash=py_cash, cost=cost)
+        flash('Bought!')
+        return redirect("/")
 
     else:
         return render_template("buyform.html")
@@ -271,6 +276,7 @@ def logout():
 def quote():
 
     if request.method == "POST":
+
         if not request.form.get("symbol"):
             return apology("please input a stock ticker", 403)
 
@@ -339,17 +345,17 @@ def register():
 def sell():
     if request.method == "POST":
 
+        # Checks form inputs are valid.
         if not request.form.get("symbol"):
              return apology("please choose a stock to sell", 403)
 
-        if not request.form.get("shares"):
+        elif not request.form.get("shares"):
             return apology("please input a whole number from 1 on up", 403)
 
-        shares = float(request.form.get("shares"))
+        elif not (request.form.get("shares")).isdigit() == True:
+            return apology("must be a positive integer")
 
-        if (shares).is_integer() != True:
-            return apology("please input a whole number from 1 on up", 403)
-
+        shares = int(request.form.get("shares"))
         symbol = lookup(request.form.get("symbol"))
         print(symbol["price"])
         print(session["user_id"])

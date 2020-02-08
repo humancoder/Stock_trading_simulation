@@ -29,8 +29,8 @@
           <td>{{ symbol.action }}<br></td>
           <td>{{ symbol.symbol }}<br></td>
           <td>{{ symbol.quantity }}<br></td>
-          <td>{{ symbol.price }}<br></td>
-          <td>{{ symbol.total }}<br></td>
+          <td>{{ "$%.3f"|format(symbol.price) }}<br></td>
+          <td>{{ "$%.2f"|format(symbol.total) }}<br></td>
           <td>{{ symbol.time }}<br></td>
         {% endfor %}
         </tr>
